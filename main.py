@@ -36,24 +36,35 @@ def extract_from_text(text):
 
 
 def calculate():
-    text = textin.get()
-    for word in text.split(' '):
-        if word.upper() in operations.keys():
+    text = textin.get().upper()
+    tokens = text.split(' ')
+    result = None
+    current_op = None
+    
+    for token in tokens:
+        if token in operations:
+            current_op = operations[token]
+        else:
             try:
-                l = extract_from_text(text)
-                r = operations[word.upper()](l[0], l[1])
-                list.delete(0,END)
-                list.insert(END,r)
-            except:
-                list.delete(0,END)
-                list.insert(END,'something went wrong please enter again')
-            finally:
-                break
-        elif word.upper() not in operations.keys():
-            list.delete(0,END)
-            list.insert(END,'something went wrong please enter again')
-
-
+                num = float(token)
+                if result is None:
+                    result = num
+                elif current_op:
+                    result = current_op(result, num)
+                    current_op = None
+                else:
+                    list.delete(0, END)
+                    list.insert(END, 'Invalid syntax.')
+                    return
+            except ValueError:
+                continue
+            
+    if result is not None:
+        list.delete(0, END)
+        list.insert(END, result)
+    else:
+        list.delete(0, END)
+        list.insert(END, 'Invalid input.')
 
     
  
